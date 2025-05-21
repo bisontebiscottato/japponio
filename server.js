@@ -1,17 +1,20 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FILE = './ordini.txt';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public'))); // serve index.html
 
 app.post('/ordine', (req, res) => {
   const { formattato } = req.body;
   if (!formattato) return res.status(400).send('Dati mancanti');
-  fs.appendFileSync(FILE, formattato + '\n');
+  fs.appendFileSync(FILE, formattato + '\\n');
   res.json({ ok: true });
 });
 
