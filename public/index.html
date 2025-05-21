@@ -2,13 +2,13 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Raccolta Ordini</title>
-  <style>
+<style>
     body {
       font-family: sans-serif;
-      max-width: 800px;
-      margin: auto;
-      padding: 2rem;
+      margin: 0 auto;
+      padding: 1rem;
       background-color: #121212;
       color: #e0e0e0;
     }
@@ -16,16 +16,17 @@
       text-align: center;
       color: #ffffff;
     }
-    
-    .main {      
+    .main {
       padding: 1rem;
       background: #1e1e1e;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255,255,255,0.05);
+      margin: auto;
     }
     label {
       display: block;
       margin-top: 1rem;
+      margin-bottom: 0.5rem;
       font-weight: bold;
       color: #cccccc;
     }
@@ -34,13 +35,14 @@
       padding: 0.5rem;
       margin-top: 0.15rem;
       margin-bottom: 0.5rem;
-
       font-size: 1rem;
       background-color: #2a2a2a;
       border: 1px solid #444;
       color: #ffffff;
       box-sizing: border-box;
- 
+    }
+    input:focus, select:focus, button:focus {
+      outline: 3px solid #3366cc;
     }
     input::placeholder {
       color: #aaaaaa;
@@ -50,8 +52,11 @@
       border: none;
       color: #ffffff;
     }
-    button:hover {
+    button:hover, button:focus {
       background-color: #254d99;
+    }
+    button:focus-visible {
+      outline: 3px solid #88aaff;
     }
     #ordini {
       margin-top: 2rem;
@@ -77,96 +82,129 @@
       padding: 0.3rem 0.7rem;
       border-radius: 4px;
       cursor: pointer;
+      width: 3rem;
     }
-    .delete-btn:hover {
+    .delete-btn:hover, .delete-btn:focus {
       background: #990000;
+      outline: 2px solid #ff5555;
     }
     .utility-buttons {
       margin-top: 1rem;
       display: flex;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 0.5rem;
     }
     .aggiungi-ordine {
       margin-top: 0.5rem;
     }
+    [aria-live] {
+      position: absolute;
+      left: -9999px;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+    }
+
+    /* Responsive Container Widths (Bootstrap-style breakpoints) */
+    @media (max-width: 575.98px) {
+      .main { max-width: 100%; }
+    }
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      .main { max-width: 540px; }
+    }
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      .main { max-width: 720px; }
+    }
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      .main { max-width: 960px; }
+    }
+    @media (min-width: 1200px) {
+      .main { max-width: 1140px; }
+    }
+
+    @media (max-width: 600px) {
+      .utility-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      input, select, button {
+        font-size: 1rem;
+      }
+    }
   </style>
+
 </head>
 <body>
-<h1> 👹
-👺
-🌸
-💮
-🍱
-🍘
-🍙
-🍚 ➡️ Japponio</h1>
-<p>Raccolta Ordini</p>
-
+<h1><span aria-hidden="true">👹👺🌸💮🍱🍘🍙🍚</span> <span>Japponio</span></h1>
 <div class="main">
-<form id="ordineForm">
-  <label>Nome Persona</label>
-  <input type="text" id="nome" required>
 
-  <label>Quantità</label>
-  <input type="number" id="quantita" value="1" min="1" required>
+<p>Raccolta Ordini</p>
+<div aria-live="polite" id="aria-feedback"></div>
 
-  <label>Tipo</label>
-  <select id="tipo" required>
-    <option value="Menu">Menu</option>
-    <option value="Prodotto Singolo">Piatti singoli</option>
-  </select>
+  <form id="ordineForm" aria-labelledby="ordineForm" role="form">
+    <label for="nome">Nome Persona</label>
+    <input type="text" id="nome" name="nome" placeholder="Es. Andrea" required aria-required="true">
 
-  <div id="menuFields">
-    <label>Tipo di Riso</label>
-    <select id="menuRiso">
-      <option value="saltato con gamberi">Saltato con gamberi</option>
-      <option value="saltato con verdure">Saltato con verdure</option>
-      <option value="saltato con pollo">Saltato con pollo</option>
-      <option value="saltato con salmone">Saltato con salmone</option>
-      <option value="riso in bianco">Riso in bianco</option>
+    <label for="quantita">Quantità</label>
+    <input type="number" id="quantita" name="quantita" value="1" min="1" required aria-required="true">
+
+    <label for="tipo">Tipo</label>
+    <select id="tipo" name="tipo" required aria-required="true">
+      <option value="Menu">Menu</option>
+      <option value="Prodotto Singolo">Piatti singoli</option>
     </select>
 
-    <label>Secondo Piatto</label>
-    <select id="secondo">
-      <option value="Branzino">Branzino</option>
-      <option value="Salmone">Salmone</option>
-      <option value="Tonno">Tonno</option>
-    </select>
+    <div id="menuFields">
+      <label for="menuRiso">Tipo di Riso</label>
+      <select id="menuRiso" name="menuRiso">
+        <option value="saltato con gamberi">Saltato con gamberi</option>
+        <option value="saltato con verdure">Saltato con verdure</option>
+        <option value="saltato con pollo">Saltato con pollo</option>
+        <option value="saltato con salmone">Saltato con salmone</option>
+        <option value="riso in bianco">Riso in bianco</option>
+      </select>
 
-    <label>Extra / Uramaki</label>
-    <input type="text" id="extra">
-  </div>
+      <label for="secondo">Secondo Piatto</label>
+      <select id="secondo" name="secondo">
+        <option value="Branzino">Branzino</option>
+        <option value="Salmone">Salmone</option>
+        <option value="Tonno">Tonno</option>
+      </select>
 
-  <div id="singoloFields" style="display: none">
-    <label>Prodotti (scegli fino a 3)</label>
-    <select id="singoloProdotti" multiple size="5">
-      <option value="riso saltato con gamberi">Riso saltato con gamberi</option>
-      <option value="riso saltato con verdure">Riso saltato con verdure</option>
-      <option value="riso saltato con pollo">Riso saltato con pollo</option>
-      <option value="riso saltato con salmone">Riso saltato con salmone</option>
-      <option value="riso in bianco">Riso in bianco</option>
-      <option value="gyoza">Gyoza</option>
-      <option value="edamame">Edamame</option>
-    </select>
-  </div>
+      <label for="extra">Extra / Uramaki / Pesce / Sushi</label>
+      <input type="text" id="extra" name="extra" placeholder="Es. Uramaki Tonno">
+    </div>
 
-  <button type="submit" class="aggiungi-ordine">Aggiungi Ordine</button>
-</form>
+    <div id="singoloFields" style="display: none">
+      <label for="singoloProdotti">Prodotti (scegli fino a 3)</label>
+      <select id="singoloProdotti" name="singoloProdotti" multiple size="5" aria-multiselectable="true">
+        <option value="riso saltato con gamberi">Riso saltato con gamberi</option>
+        <option value="riso saltato con verdure">Riso saltato con verdure</option>
+        <option value="riso saltato con pollo">Riso saltato con pollo</option>
+        <option value="riso saltato con salmone">Riso saltato con salmone</option>
+        <option value="riso in bianco">Riso in bianco</option>
+        <option value="gyoza">Gyoza</option>
+        <option value="edamame">Edamame</option>
+      </select>
+    </div>
+
+    <button type="submit" class="aggiungi-ordine">Aggiungi Ordine</button>
+  </form>
+
+
+
+<div id="ordini">
+  <h2>📋 Ordini Raccolti</h2>
+  <div id="listaOrdini"></div>
 </div>
-
+<hr>
 <div class="utility-buttons">
   <button onclick="caricaOrdini()">🔄 Ricarica Ordini</button>
   <button onclick="resetOrdini()">🗑️ Reset Ordini</button>
   <button onclick="esportaOrdini()">💾 Esporta .txt</button>
   <button onclick="copiaOrdini()">📋 Copia in Clipboard</button>
 </div>
-
-<div id="ordini">
-  <h2>📋 Ordini Raccolti</h2>
-  <div id="listaOrdini"></div>
 </div>
-
 <script>
   const form = document.getElementById('ordineForm');
   const tipoSelect = document.getElementById('tipo');
