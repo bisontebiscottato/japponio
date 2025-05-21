@@ -16,9 +16,10 @@
       text-align: center;
       color: #ffffff;
     }
-    form {
-      background: #1e1e1e;
+    
+    .main {      
       padding: 1rem;
+      background: #1e1e1e;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255,255,255,0.05);
     }
@@ -31,11 +32,15 @@
     input, select, button {
       width: 100%;
       padding: 0.5rem;
-      margin-top: 0.3rem;
+      margin-top: 0.15rem;
+      margin-bottom: 0.5rem;
+
       font-size: 1rem;
       background-color: #2a2a2a;
       border: 1px solid #444;
       color: #ffffff;
+      box-sizing: border-box;
+ 
     }
     input::placeholder {
       color: #aaaaaa;
@@ -82,10 +87,23 @@
       justify-content: space-between;
       gap: 1rem;
     }
+    .aggiungi-ordine {
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
-<h1>📝 Raccolta Ordini</h1>
+<h1> 👹
+👺
+🌸
+💮
+🍱
+🍘
+🍙
+🍚 ➡️ Japponio</h1>
+<p>Raccolta Ordini</p>
+
+<div class="main">
 <form id="ordineForm">
   <label>Nome Persona</label>
   <input type="text" id="nome" required>
@@ -96,7 +114,7 @@
   <label>Tipo</label>
   <select id="tipo" required>
     <option value="Menu">Menu</option>
-    <option value="Prodotto Singolo">Prodotto Singolo</option>
+    <option value="Prodotto Singolo">Piatti singoli</option>
   </select>
 
   <div id="menuFields">
@@ -133,8 +151,9 @@
     </select>
   </div>
 
-  <button type="submit">Aggiungi Ordine</button>
+  <button type="submit" class="aggiungi-ordine">Aggiungi Ordine</button>
 </form>
+</div>
 
 <div class="utility-buttons">
   <button onclick="caricaOrdini()">🔄 Ricarica Ordini</button>
