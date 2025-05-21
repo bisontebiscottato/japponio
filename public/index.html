@@ -76,6 +76,12 @@
     .delete-btn:hover {
       background: #990000;
     }
+    .utility-buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -130,6 +136,13 @@
   <button type="submit">Aggiungi Ordine</button>
 </form>
 
+<div class="utility-buttons">
+  <button onclick="caricaOrdini()">🔄 Ricarica Ordini</button>
+  <button onclick="resetOrdini()">🗑️ Reset Ordini</button>
+  <button onclick="esportaOrdini()">💾 Esporta .txt</button>
+  <button onclick="copiaOrdini()">📋 Copia in Clipboard</button>
+</div>
+
 <div id="ordini">
   <h2>📋 Ordini Raccolti</h2>
   <div id="listaOrdini"></div>
@@ -141,6 +154,7 @@
   const menuFields = document.getElementById('menuFields');
   const singoloFields = document.getElementById('singoloFields');
   const singoloProdotti = document.getElementById('singoloProdotti');
+  const listaOrdini = document.getElementById('listaOrdini');
 
   tipoSelect.addEventListener('change', () => {
     const isMenu = tipoSelect.value === 'Menu';
@@ -172,7 +186,6 @@
       formattato += ' ' + selected.join(' + ');
     }
 
-    // Salva lato server via POST API
     try {
       await fetch('https://japponio.onrender.com/ordine', {
         method: 'POST',
@@ -182,10 +195,76 @@
       alert("Ordine inviato con successo!");
       form.reset();
       tipoSelect.dispatchEvent(new Event('change'));
+      caricaOrdini();
     } catch (err) {
       alert("Errore nel salvataggio dell'ordine. Riprova.");
     }
   });
+
+  async function caricaOrdini() {
+    try {
+      const res = await fetch('https://japponio.onrender.com/ordini/export.txt');
+      const text = await res.text();
+      const righe = text.trim().split('\n');
+      listaOrdini.innerHTML = '';
+      righe.forEach((riga, index) => {
+        const div = document.createElement('div');
+        div.className = 'ordine';
+        div.innerHTML = `<div class="ordine-text">${riga}</div><button class="delete-btn" onclick="deleteOrdine(${index})">X</button>`;
+        listaOrdini.appendChild(div);
+      });
+    } catch (err) {
+      console.error('Errore nel caricamento ordini:', err);
+    }
+  }
+
+  async function deleteOrdine(index) {
+    try {
+      await fetch(`https://japponio.onrender.com/ordini/delete/${index}`, {
+        method: 'DELETE'
+      });
+      caricaOrdini();
+    } catch (err) {
+      console.error('Errore nella cancellazione ordine:', err);
+    }
+  }
+
+  async function resetOrdini() {
+    if (!confirm('Sei sicuro di voler cancellare tutti gli ordini?')) return;
+    try {
+      await fetch('https://japponio.onrender.com/ordini/reset', {
+        method: 'DELETE'
+      });
+      caricaOrdini();
+    } catch (err) {
+      console.error('Errore nella cancellazione completa degli ordini:', err);
+    }
+  }
+
+  async function esportaOrdini() {
+    try {
+      const res = await fetch('https://japponio.onrender.com/ordini/export.txt');
+      const text = await res.text();
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'ordini.txt';
+      link.click();
+    } catch (err) {
+      alert('Errore durante il download degli ordini.');
+    }
+  }
+
+  async function copiaOrdini() {
+    try {
+      const res = await fetch('https://japponio.onrender.com/ordini/export.txt');
+      const text = await res.text();
+      await navigator.clipboard.writeText(text);
+      alert('Ordini copiati nella clipboard!');
+    } catch (err) {
+      alert('Errore durante la copia nella clipboard.');
+    }
+  }
+
+  caricaOrdini();
 </script>
-</body>
-</html>
