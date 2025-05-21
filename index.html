@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Raccolta Ordini</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #ffffff;
+    }
+    form {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #cccccc;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      font-size: 1rem;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: #ffffff;
+    }
+    input::placeholder {
+      color: #aaaaaa;
+    }
+    button {
+      background-color: #3366cc;
+      border: none;
+      color: #ffffff;
+    }
+    button:hover {
+      background-color: #254d99;
+    }
+    #ordini {
+      margin-top: 2rem;
+    }
+    .ordine {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.7rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ordine-text {
+      font-family: monospace;
+      color: #ffffff;
+    }
+    .delete-btn {
+      background: #cc0000;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background: #990000;
+    }
+  </style>
+</head>
+<body>
+<h1>📝 Raccolta Ordini</h1>
+<form id="ordineForm">
+  <label>Nome Persona</label>
+  <input type="text" id="nome" required>
+
+  <label>Quantità</label>
+  <input type="number" id="quantita" value="1" min="1" required>
+
+  <label>Tipo</label>
+  <select id="tipo" required>
+    <option value="Menu">Menu</option>
+    <option value="Prodotto Singolo">Prodotto Singolo</option>
+  </select>
+
+  <div id="menuFields">
+    <label>Tipo di Riso</label>
+    <select id="menuRiso">
+      <option value="saltato con gamberi">Saltato con gamberi</option>
+      <option value="saltato con verdure">Saltato con verdure</option>
+      <option value="saltato con pollo">Saltato con pollo</option>
+      <option value="saltato con salmone">Saltato con salmone</option>
+      <option value="riso in bianco">Riso in bianco</option>
+    </select>
+
+    <label>Secondo Piatto</label>
+    <select id="secondo">
+      <option value="Branzino">Branzino</option>
+      <option value="Salmone">Salmone</option>
+      <option value="Tonno">Tonno</option>
+    </select>
+
+    <label>Extra / Uramaki</label>
+    <input type="text" id="extra">
+  </div>
+
+  <div id="singoloFields" style="display: none">
+    <label>Prodotti (scegli fino a 3)</label>
+    <select id="singoloProdotti" multiple size="5">
+      <option value="riso saltato con gamberi">Riso saltato con gamberi</option>
+      <option value="riso saltato con verdure">Riso saltato con verdure</option>
+      <option value="riso saltato con pollo">Riso saltato con pollo</option>
+      <option value="riso saltato con salmone">Riso saltato con salmone</option>
+      <option value="riso in bianco">Riso in bianco</option>
+      <option value="gyoza">Gyoza</option>
+      <option value="edamame">Edamame</option>
+    </select>
+  </div>
+
+  <button type="submit">Aggiungi Ordine</button>
+</form>
+
+<div id="ordini">
+  <h2>📋 Ordini Raccolti</h2>
+  <div id="listaOrdini"></div>
+</div>
+
+<script>
+  const form = document.getElementById('ordineForm');
+  const tipoSelect = document.getElementById('tipo');
+  const menuFields = document.getElementById('menuFields');
+  const singoloFields = document.getElementById('singoloFields');
+  const singoloProdotti = document.getElementById('singoloProdotti');
+
+  tipoSelect.addEventListener('change', () => {
+    const isMenu = tipoSelect.value === 'Menu';
+    menuFields.style.display = isMenu ? 'block' : 'none';
+    singoloFields.style.display = isMenu ? 'none' : 'block';
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const persona = document.getElementById('nome').value.trim();
+    const quantita = parseInt(document.getElementById('quantita').value);
+    const tipo = tipoSelect.value;
+
+    let formattato = `[${persona}] - N.${quantita}`;
+
+    if (tipo === 'Menu') {
+      const riso = document.getElementById('menuRiso').value;
+      const secondo = document.getElementById('secondo').value;
+      const extra = document.getElementById('extra').value.trim();
+      formattato += ` Menu con Riso ${riso} - ${secondo}`;
+      if (extra) formattato += ` - ${extra}`;
+    } else {
+      const selected = Array.from(singoloProdotti.selectedOptions).map(opt => opt.value);
+      if (selected.length === 0 || selected.length > 3) {
+        alert("Seleziona da 1 a 3 prodotti.");
+        return;
+      }
+      formattato += ' ' + selected.join(' + ');
+    }
+
+    // Salva lato server via POST API
+    try {
+      await fetch('https://your-api-endpoint.onrender.com/ordine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formattato })
+      });
+      alert("Ordine inviato con successo!");
+      form.reset();
+      tipoSelect.dispatchEvent(new Event('change'));
+    } catch (err) {
+      alert("Errore nel salvataggio dell'ordine. Riprova.");
+    }
+  });
+</script>
+</body>
+</html>
